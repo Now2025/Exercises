@@ -2,10 +2,14 @@
 pragma solidity ^0.8.0;
 
 contract Bank {
+    struct Depositor {
+        address addr;
+        uint256 amount;
+    }
+
     address public admin;
     mapping(address => uint256) public balances;
-    address[3] public topDepositors;
-    uint256[3] public topAmounts;
+    Depositor[3] public topDepositors;
 
     constructor() {
         admin = msg.sender;
@@ -30,16 +34,27 @@ contract Bank {
 
     // Function to update top depositors
     function updateTopDepositors(address depositor, uint256 amount) private {
+        // Remove existing entry if present
         for (uint i = 0; i < 3; i++) {
-            if (amount > topAmounts[i]) {
+            if (topDepositors[i].addr == depositor) {
+                // Remove the existing entry
+                for (uint j = i; j < 2; j++) {
+                    topDepositors[j] = topDepositors[j+1];
+                }
+                topDepositors[2] = Depositor(address(0), 0);
+                break;
+            }
+        }
+
+        // Insert at the correct position
+        for (uint i = 0; i < 3; i++) {
+            if (amount > topDepositors[i].amount) {
                 // Shift existing entries down
                 for (uint j = 2; j > i; j--) {
-                    topAmounts[j] = topAmounts[j-1];
                     topDepositors[j] = topDepositors[j-1];
                 }
                 // Insert new entry
-                topAmounts[i] = amount;
-                topDepositors[i] = depositor;
+                topDepositors[i] = Depositor(depositor, amount);
                 break;
             }
         }
@@ -58,6 +73,14 @@ contract Bank {
 
     // Function to get top depositors
     function getTopDepositors() public view returns (address[3] memory, uint256[3] memory) {
-        return (topDepositors, topAmounts);
+        address[3] memory addresses;
+        uint256[3] memory amounts;
+        
+        for(uint i = 0; i < 3; i++) {
+            addresses[i] = topDepositors[i].addr;
+            amounts[i] = topDepositors[i].amount;
+        }
+        
+        return (addresses, amounts);
     }
 }

@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract Bank {
+import "./IBank.sol";
+
+contract Bank is IBank {
     struct Depositor {
         address addr;
         uint256 amount;
@@ -21,19 +23,19 @@ contract Bank {
     }
 
     // Function to receive ETH deposits
-    receive() external payable {
+    receive() external virtual payable {
         balances[msg.sender] += msg.value;
         updateTopDepositors(msg.sender, balances[msg.sender]);
     }
 
     // Fallback function
-    fallback() external payable {
+    fallback() external virtual payable {
         balances[msg.sender] += msg.value;
         updateTopDepositors(msg.sender, balances[msg.sender]);
     }
 
     // Function to update top depositors
-    function updateTopDepositors(address depositor, uint256 amount) private {
+    function updateTopDepositors(address depositor, uint256 amount) internal {
         // Remove existing entry if present
         for (uint i = 0; i < 3; i++) {
             if (topDepositors[i].addr == depositor) {

@@ -11,12 +11,14 @@ contract BigBank is Bank {
 
     // Override receive function with minDeposit modifier
     receive() override external payable  minDeposit {
-        Bank.receive();
+        balances[msg.sender] += msg.value;
+        updateTopDepositors(msg.sender, balances[msg.sender]);
     }
 
     // Override fallback function with minDeposit modifier
     fallback() override external payable  minDeposit {
-        Bank.fallback();
+        balances[msg.sender] += msg.value;
+        updateTopDepositors(msg.sender, balances[msg.sender]);
     }
 
     // Function to transfer admin rights

@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract BaseERC20 {
+import "./IERC20.sol";
+import "./IERC20Receiver.sol";
+
+contract BaseERC20 is IERC20 {
     // 代币名称
     string public name = "BaseERC20"; 
     // 代币符号
@@ -88,5 +91,37 @@ contract BaseERC20 {
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         // 返回该spender剩余可以从_owner账户中转账的额度
         return allowances[_owner][_spender];
+    }
+
+    // 转账并调用目标合约的 tokensReceived 方法
+    function transferWithCallback(address _to, uint256 _value) public returns (bool success) {
+        // 检查目标地址是否为零地址
+        require(_to != address(0), "ERC20: transfer to the zero address");
+        // 检查调用者是否有足够的余额进行转账
+        require(balances[msg.sender] >= _value, "ERC20: transfer amount exceeds balance");
+
+        // 执行转账
+        balances[msg.sender] -= _value;
+        balances[_to] += _value;
+
+        // 触发 Transfer 事件
+        emit Transfer(msg.sender, _to, _value);
+
+        // 检查目标地址是否是合约地址
+        if (isContract(_to)) {
+            // 调用目标合约的 tokensReceived 方法
+            IERC20Receiver(_to).tokensReceived(msg.sender, _value);
+        }
+
+        return true;
+    }
+
+    // 检查地址是否是合约地址的辅助函数
+    function isContract(address _addr) private view returns (bool) {
+        uint32 size;
+        assembly {
+            size := extcodesize(_addr)
+        }
+        return (size > 0);
     }
 }

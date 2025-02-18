@@ -1,0 +1,21 @@
+{
+  "name": "My Awesome NFT",
+  "description": "This is a unique, awesome NFT that represents a digital asset.",
+  "image": "https://ipfs.io/ipfs/QmT4UJH6yFgXvuyadptz7m9N6Y2tiLsuxs3y1k8XfFzRVX1",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Blue"
+    },
+    {
+      "trait_type": "Shape",
+      "value": "Circle"
+    },
+    {
+      "trait_type": "Rarity",
+      "value": "Legendary"
+    }
+  ],
+  "creator": "0x5b38Da6a701c568545dCfcB03FcB875f56beddC4",
+  "external_url": "https://www.myawesome-nft.com"
+}
